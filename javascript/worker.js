@@ -9,7 +9,7 @@ var lsystem_worker = function() {
     var rules = {},
         seed,
         iteration,
-        segments,
+        points,
         cWidth,
         cHeight,
         length = 5,
@@ -26,14 +26,15 @@ var lsystem_worker = function() {
 			}
 			angle = e.data.l_system.angle * RAD;
       seed = generateSeed(seed, iteration, rules);
-      segments = generateSegment(seed, cWidth, cHeight, length, offset, angle);
-      postMessage({'segments': segments, 'xOffset': offset.x, 'yOffset': offset.y});
+      points = generateSegment(seed, cWidth, cHeight, length, offset, angle);
+      postMessage({'points': points, 'xOffset': offset.x, 'yOffset': offset.y});
     }
   };
 
-  function Point(x, y) {
+  function Point(x, y, c) {
     this.x = x;
     this.y = y;
+		this.color = c;
   };
 
   function Color(r, g, b, o) {
@@ -46,12 +47,6 @@ var lsystem_worker = function() {
   function State(c, a) {
     this.point = c;
     this.angle = a;
-  };
-
-  function Segment(s, e, c) {
-    this.start = s;
-    this.end = e;
-    this.color = c;
   };
 
   function replace(seed, rules) {
@@ -73,12 +68,12 @@ var lsystem_worker = function() {
 
   function generateSegment(seed, cWidth, cHeight, length, offset, angle) {
     var center = new Point(cWidth / 2, cHeight / 2),
-        start = new Point(center.x, center.y),
-        end = new Point(center.x, center.y),
+        r = g = b = o = 128,
+        color = new Color(r, g, b, o),
+        start = new Point(center.x, center.y, color),
+        end = new Point(center.x, center.y, color),
         stack = [],
-				segments = [],
-        color = new Color(0, 0, 0, 128),
-        r = g = b = 128,
+				points = [start],
         right = left = cWidth / 2,
         top = bottom = cHeight / 2,
         changeDirection = false,
@@ -91,7 +86,7 @@ var lsystem_worker = function() {
         case "f":
           end.x = start.x + length * Math.cos(currentAngle);
           end.y = start.y + length * Math.sin(currentAngle);
-          segments.push(new Segment(new Point(start.x, start.y), new Point(end.x, end.y), new Color(r, g, b, 128)));
+          points.push(new Point(end.x, end.y, color));
 
           // redefine boundaries
           if (start.x < left) left = start.x;
@@ -139,7 +134,7 @@ var lsystem_worker = function() {
 		
 		length *= factor;
 
-		return segments;
+		return points;
   }
 
   return {

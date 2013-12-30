@@ -13,24 +13,24 @@ $(document).ready(function () {
 
     lsystem_worker.onmessage = function(e) { 
 
-		  var lines,
+		  var points,
 			    xOffset,
 					yOffset;
     
       ctx.clearRect(0, 0, c.width, c.height);
 
       if (e) {
-        lines = e.data.segments;
+        points = e.data.points;
         xOffset = e.data.xOffset;
         yOffset = e.data.yOffset;
         
         ctx.beginPath();
 
-        if (lines.length !== 0) {
+        if (points.length !== 0) {
           var i = 0, th;
           th = setInterval(function() {
-            if (i < lines.length) {
-              drawLine(lines[i++], xOffset, yOffset); 
+            if (i < points.length - 1) {
+              drawLine(points[i], points[++i], xOffset, yOffset); 
             } else {
               clearInterval(th);
                $('.drawButton').prop('disabled', false);
@@ -54,15 +54,15 @@ $(document).ready(function () {
     return Math.round(i * 2) / 2 + (Math.round(i * 2) % 2 === 0 ? 0.5 : 0);
   }
 
-  function drawLine(line, xOffset, yOffset) {
-    var startX = roundToHalf(line.start.x),
-        startY = roundToHalf(line.start.y),
-        endX = roundToHalf(line.end.x),
-        endY = roundToHalf(line.end.y); 
+  function drawLine(start, end, xOffset, yOffset) {
+    var startX = roundToHalf(start.x),
+        startY = roundToHalf(start.y),
+        endX = roundToHalf(end.x),
+        endY = roundToHalf(end.y); 
 
     ctx.moveTo(startX + xOffset, startY + yOffset);
     ctx.lineTo(endX + xOffset, endY + yOffset);
-    ctx.strokeStyle = 'rgb(' + line.color.r + ', ' + line.color.g + ', ' +  line.color.b + ')';
+    ctx.strokeStyle = 'rgb(' + end.color.r + ', ' + end.color.g + ', ' +  end.color.b + ')';
     ctx.stroke();
   }
 
