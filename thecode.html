@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+		<head>
+				<title>TheCode</title>
+				<link href="style/thecode.css" rel="stylesheet" /> 
+		</head>
+		<body> 
+				<div id="stage"> 
+						<canvas id="canvas" width="660" height="660"></canvas>
+						<div id="rules"> 
+								<ol>
+										<li>
+										<label for="axoim">Start</label>
+										<input id="axoim" class="inputBox" type="text"></input>
+										</li>
+										<li>Rules
+										<ol>
+												<li>
+												<label id="rule" class="key">X-></label>
+												<input id="rule" class="sub inputBox" type="text"></input>
+												<span class="button letterButton">+</span>
+												</li>
+												<li>
+												<label id="rule" class="key">F-></label>
+												<input id="rule" class="sub inputBox" type="text"></input>
+												<span class="button letterButton">+</span>
+												</li>
+									 	</ol>
+										</li>
+										<li>
+										<label>Angle</label>
+										<input id="angle" class="angle inputBox" type="number"></input><span class="degree">&deg;<span>
+										</li>
+										<li>
+										<label for="iteration">Iteration</label>
+									 	<input id="iteration" class="iteration inputBox" type="number" min="1" max="10" step="1" value="5" />
+										</li>
+								</ol>
+								<div class="buttonDiv">
+										<button class="button drawButton" type="button">Draw</button>
+										<button class="button iterateButton" type="button">Draw by Iteration</button>
+							 	</div>
+						</div>
+				</div>
+				<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+				<script src="javascript/thecode.js"></script> 
+				<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
+		</body>
+</html>
+
+
+
+
+

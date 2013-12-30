@@ -1,0 +1,100 @@
+body {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		font-family: "Courier", sans-serif;
+		font-size: .8em;
+}
+
+#stage {
+		position: absolute;
+		margin: -330px 0 0 -480px;
+		top: 50%;
+		left: 50%;
+		width: 960px;
+		height: 660px;
+}
+
+#canvas {
+		position: absolute;
+		height: 660px;
+		width: 660px;
+		border: 1px solid #999;
+}
+
+input {
+		text-transform: uppercase;
+}
+
+ol {
+		-webkit-padding-start: 20px !important;
+}
+
+#rules li {
+		margin: 0 0 9px 0;
+		width: 100%;
+		display: block;
+		position: relative;
+}
+
+#rules label {
+		display: inline-block;
+		width: 32px;
+}
+
+#rules {
+		position: absolute;
+		right: 0px;
+		height: 660px;
+		width: 296px;
+		/*border: 1px solid #999;*/
+}
+
+.inputBox {
+		position: relative;
+		width: 76px;
+		left: 40px;
+		letter-spacing: 2px;
+		border: 1px solid #999;
+		padding-left: 2px;
+}
+
+.key {
+		/*margin-left: 8px;*/
+		font-size: .9em;
+		left: 20px;
+}
+
+.sub {
+		width: 128px;
+	 	font-size: 0.9em;
+		left: 20px;
+}
+
+.angle {
+	 	width: 36px;
+}
+
+.iteration {
+		width: 36px;
+}
+
+.degree {
+	 	padding-left: 40px;
+}
+
+.buttonDiv {
+	 	padding-left: 20px;
+}
+
+.button { 
+		cursor: pointer;
+	 	font-family: "Arial", sans-serif;
+ }
+
+.letterButton {
+		margin-left: 20px;
+		font-size: 1.2em;
+	 	color: #666;
+}
