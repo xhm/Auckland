@@ -13,6 +13,7 @@ var lsystem_worker = function() {
         cHeight,
         length = 5,
         angle,
+				drawIteration,
 				drawingElements = {};
 
     if (e.data) {
@@ -20,13 +21,22 @@ var lsystem_worker = function() {
       cHeight = e.data.cHeight;
       seed = e.data.l_system.axoim;
       iteration = e.data.l_system.iteration;
-			for (var key in e.data.l_system.rules) {
-					rules[key] = e.data.l_system.rules[key];
-			}
+			drawIteration = e.data.drawIteration;
 			angle = e.data.l_system.angle * RAD;
-      seed = generateString(seed, iteration, rules);
-      drawingElements = generateDrawingElements(seed, cWidth, cHeight, length, angle);
-      postMessage(drawingElements);
+			rules = e.data.l_system.rules;
+
+			if (drawIteration)
+			{
+					for (var i = 0; i < iteration; ++i) {
+							seed = generateString(seed, iteration, rules);
+							drawingElements = generateDrawingElements(seed, cWidth, cHeight, length, angle);
+							postMessage(drawingElements);
+					}
+			} else {
+				 	seed = generateString(seed, iteration, rules);
+				 	drawingElements = generateDrawingElements(seed, cWidth, cHeight, length, angle);
+				 	postMessage(drawingElements);
+			}
     }
   };
 
@@ -52,7 +62,7 @@ var lsystem_worker = function() {
     var newSeed = [];
     for (var i = 0; i < seed.length; ++i) {
       if (rules[seed[i]])
-        newSeed = newSeed.concat(rules[seed[i]].split(''));
+        newSeed = newSeed.concat(rules[seed[i]]);
       else
         newSeed.push(seed[i]);
     }
@@ -81,8 +91,6 @@ var lsystem_worker = function() {
 				scale,
 				drawingElements;
 
-		//length /= iteration;
-
     for (var i = 0; i < seed.length; ++i) {
       switch (seed[i]) {
         case "f":
@@ -101,7 +109,6 @@ var lsystem_worker = function() {
           start.y = end.y;
 
           break;
-
         case "x":
           break;
         case "+":

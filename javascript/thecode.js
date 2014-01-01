@@ -40,11 +40,11 @@ $(document).ready(function () {
               drawLine(points[i], points[++i], offset); 
             } else {
               clearInterval(th);
-               $('.drawButton').prop('disabled', false);
+               $('.button').prop('disabled', false);
             }
           }, 1);
         } else {
-         $('.drawButton').prop('disabled', false);
+         $('.button').prop('disabled', false);
         }
 
 				/*
@@ -87,20 +87,21 @@ $(document).ready(function () {
     ctx.stroke();
   }
 
-  $('.drawButton').on('click', function() {
+  $('.drawButton, .iterationButton').on('click', function(e) {
     var ls = buildLS();
 		    
     lsystem_worker.postMessage({
              'cWidth': c.width,
              'cHeight': c.height,
+						 'drawIteration': $(this).hasClass('iterationButton'),
              'l_system': ls
              });    
-    $(this).prop('disabled', true);
+    $('.button').prop('disabled', true);
   });
 
 	function buildLS() {
-    var key = $.map($('label.key'), function (i) { return $(i).html()[0].toLowerCase(); }),
-        sub = $.map($('input.sub'), function (i) { return $(i).val().toLowerCase(); }),
+    var key = $.map($('label.key'), function(i) { return $(i).html()[0].toLowerCase(); }),
+        sub = $.map($('input.sub'), function(i) { return $(i).val().toLowerCase(); }),
 			 	rules = {};
 
     $.each(key, function (i, v) { rules[v] = sub[i]; });
@@ -128,7 +129,7 @@ $(document).ready(function () {
   L_system.prototype = {
     addRule: function (rule) {
            for (var key in rule) {
-             this.rules[key] = rule[key];
+             this.rules[key] = rule[key].split('');
            }
            return this;
          }
