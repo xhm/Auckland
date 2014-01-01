@@ -88,12 +88,20 @@ $(document).ready(function () {
   }
 
   $('.drawButton').on('click', function() {
+    var ls = buildLS();
+		    
+    lsystem_worker.postMessage({
+             'cWidth': c.width,
+             'cHeight': c.height,
+             'l_system': ls
+             });    
+    $(this).prop('disabled', true);
+  });
 
-    ctx.clearRect(0, 0, c.width, c.height);
-
-		key = $.map($('label.key'), function (i) { return $(i).html()[0].toLowerCase(); });
-    sub = $.map($('input.sub'), function (i) { return $(i).val().toLowerCase(); });
-		rules = {};
+	function buildLS() {
+    var key = $.map($('label.key'), function (i) { return $(i).html()[0].toLowerCase(); }),
+        sub = $.map($('input.sub'), function (i) { return $(i).val().toLowerCase(); }),
+			 	rules = {};
 
     $.each(key, function (i, v) { rules[v] = sub[i]; });
 
@@ -106,14 +114,9 @@ $(document).ready(function () {
     ls.iteration = $('#iteration').val();
     //ls.angle = $('#angle').val(); 
 		ls.angle = '60';
-    
-    lsystem_worker.postMessage({
-             'cWidth': c.width,
-             'cHeight': c.height,
-             'l_system': ls
-             });    
-    $(this).prop('disabled', true);
-  });
+
+		return ls;
+	}
 
   function L_system() {
     this.axoim = '';
