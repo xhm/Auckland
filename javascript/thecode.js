@@ -5,7 +5,7 @@ $(document).ready(function () {
       lsystem_worker;
      
 	ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, c.width, c.height);
+  //ctx.clearRect(0, 0, c.width, c.height);
 
   if (typeof(Worker) !== 'undefined') {
 
@@ -13,24 +13,31 @@ $(document).ready(function () {
 
     lsystem_worker.onmessage = function(e) { 
 
-		  var points,
-			    xOffset,
-					yOffset;
+		  var points = [],
+			    offset = {},
+					scale = 0.0;
     
-      ctx.clearRect(0, 0, c.width, c.height);
+      //ctx.clearRect(0, 0, c.width, c.height);
 
       if (e) {
         points = e.data.points;
-        xOffset = e.data.xOffset;
-        yOffset = e.data.yOffset;
-        
+        offset = e.data.offset;
+				scale = e.data.scale;
+
+				//ctx.transform(scale, 0, 0, scale, -(scale*660-660)/2, -(scale*660-660)/2);
+
+				ctx.restore();
+				ctx.save();
+				ctx.translate(-(scale*660-660)/2, -(scale*660-660)/2);
+				ctx.scale(scale, scale);
+				ctx.clearRect(0, 0, c.width, c.height);
         ctx.beginPath();
 
         if (points.length !== 0) {
           var i = 0, th;
           th = setInterval(function() {
             if (i < points.length - 1) {
-              drawLine(points[i], points[++i], xOffset, yOffset); 
+              drawLine(points[i], points[++i], offset); 
             } else {
               clearInterval(th);
                $('.drawButton').prop('disabled', false);
@@ -38,7 +45,20 @@ $(document).ready(function () {
           }, 1);
         } else {
          $('.drawButton').prop('disabled', false);
-         }
+        }
+
+				/*
+				if (points.length !== 0)
+				{
+						for (var i = 0; i < points.length - 1;)
+						{
+								drawLine(points[i], points[++i], offset);
+						}
+				}
+        $('.drawButton').prop('disabled', false);
+				*/
+
+				ctx.closePath();
       }
     }
 
@@ -54,14 +74,15 @@ $(document).ready(function () {
     return Math.round(i * 2) / 2 + (Math.round(i * 2) % 2 === 0 ? 0.5 : 0);
   }
 
-  function drawLine(start, end, xOffset, yOffset) {
+  function drawLine(start, end, offset) {
     var startX = roundToHalf(start.x),
         startY = roundToHalf(start.y),
         endX = roundToHalf(end.x),
-        endY = roundToHalf(end.y); 
+        endY = roundToHalf(end.y),
+				key, sub, rules, ls; 
 
-    ctx.moveTo(startX + xOffset, startY + yOffset);
-    ctx.lineTo(endX + xOffset, endY + yOffset);
+    ctx.moveTo(startX + offset.x, startY + offset.y);
+    ctx.lineTo(endX + offset.x, endY + offset.y);
     ctx.strokeStyle = 'rgb(' + end.color.r + ', ' + end.color.g + ', ' +  end.color.b + ')';
     ctx.stroke();
   }
@@ -70,19 +91,21 @@ $(document).ready(function () {
 
     ctx.clearRect(0, 0, c.width, c.height);
 
-		var key = $.map($('label.key'), function (i) { return $(i).html()[0].toLowerCase(); }),
-		    sub = $.map($('input.sub'), function (i) { return $(i).val().toLowerCase(); }),
-				rules = {};
+		key = $.map($('label.key'), function (i) { return $(i).html()[0].toLowerCase(); });
+    sub = $.map($('input.sub'), function (i) { return $(i).val().toLowerCase(); });
+		rules = {};
 
     $.each(key, function (i, v) { rules[v] = sub[i]; });
 
-    var ls = new L_system();
+    ls = new L_system();
  
-		ls.addRule(rules);
-    //ls.addRule({'x': 'f[+x]f[-x]+x'}).addRule({'f': 'ff'});
-    ls.axoim = $('#axoim').val().toLowerCase();
+		//ls.addRule(rules);
+    ls.addRule({'f': 'f-f++f-f'});
+    //ls.axoim = $('#axoim').val().toLowerCase();
+		ls.axoim = 'f++f++f';
     ls.iteration = $('#iteration').val();
-    ls.angle = $('#angle').val(); 
+    //ls.angle = $('#angle').val(); 
+		ls.angle = '60';
     
     lsystem_worker.postMessage({
              'cWidth': c.width,

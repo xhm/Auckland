@@ -9,12 +9,11 @@ var lsystem_worker = function() {
     var rules = {},
         seed,
         iteration,
-        points,
         cWidth,
         cHeight,
         length = 5,
-        offset = new Point(0, 0),
-        angle;
+        angle,
+				drawingElements = {};
 
     if (e.data) {
       cWidth = e.data.cWidth;
@@ -25,9 +24,9 @@ var lsystem_worker = function() {
 					rules[key] = e.data.l_system.rules[key];
 			}
 			angle = e.data.l_system.angle * RAD;
-      seed = generateSeed(seed, iteration, rules);
-      points = generateSegment(seed, cWidth, cHeight, length, offset, angle);
-      postMessage({'points': points, 'xOffset': offset.x, 'yOffset': offset.y});
+      seed = generateString(seed, iteration, rules);
+      drawingElements = generateDrawingElements(seed, cWidth, cHeight, length, angle);
+      postMessage(drawingElements);
     }
   };
 
@@ -60,24 +59,27 @@ var lsystem_worker = function() {
     return newSeed;
   }
 
-  function generateSeed(seed, iteration, rules) {
+  function generateString(seed, iteration, rules) {
     for (var i = 0; i < iteration; ++i)
       seed = replace(seed, rules);
     return seed;
   }
 
-  function generateSegment(seed, cWidth, cHeight, length, offset, angle) {
+  function generateDrawingElements(seed, cWidth, cHeight, length, angle) {
     var center = new Point(cWidth / 2, cHeight / 2),
         r = g = b = o = 128,
         color = new Color(r, g, b, o),
         start = new Point(center.x, center.y, color),
         end = new Point(center.x, center.y, color),
+				offset = new Point(0, 0),
         stack = [],
 				points = [start],
         right = left = cWidth / 2,
         top = bottom = cHeight / 2,
         changeDirection = false,
-        currentAngle = -1.57079633;
+        currentAngle = -1.57079633,
+				scale,
+				drawingElements;
 
 		//length /= iteration;
 
@@ -123,18 +125,20 @@ var lsystem_worker = function() {
     offset.x = Math.floor(center.x - (left + right) / 2);
     offset.y = Math.floor(center.y - (top + bottom) / 2);
 
-		/* adjust line length
-		 * Augment the pattern by enlarge the line length by a factor that is
-		 * determined by 
-		 */
-		var height = bottom - top,
-			 	width = right -left,
-			 	d = height - width > 0 ? height : width,
-				factor = 600 / d;
-		
-		length *= factor;
+		imageHeight = bottom - top;
+	  imageWidth = right -left;
 
-		return points;
+	 	dominant = imageHeight - imageWidth > 0 ? imageHeight : imageWidth;
+
+		scale = 600 / dominant;
+
+		drawingElements = {
+        points: points,
+				offset: offset,
+				scale: scale
+		};
+
+		return drawingElements;
   }
 
   return {
