@@ -3,7 +3,8 @@
 
 var lsystem_worker = function() {
 
-  var RAD = Math.PI / 180;
+  var RAD = Math.PI / 180,
+      LENGTH = 5;
 
   onmessage = function(e) {
     var rules = {},
@@ -11,39 +12,46 @@ var lsystem_worker = function() {
         iteration,
         cWidth,
         cHeight,
-        length = 5,
         angle,
-				drawIteration,
-				drawingElements = {};
+        drawIteration,
+        drawingElements = {};
 
     if (e.data) {
       cWidth = e.data.cWidth;
       cHeight = e.data.cHeight;
       seed = e.data.l_system.axoim;
       iteration = e.data.l_system.iteration;
-			drawIteration = e.data.drawIteration;
-			angle = e.data.l_system.angle * RAD;
-			rules = e.data.l_system.rules;
+      drawIteration = e.data.drawIteration;
+      angle = e.data.l_system.angle * RAD;
+      rules = e.data.l_system.rules;
 
-			if (drawIteration)
-			{
-					for (var i = 0; i < iteration; ++i) {
-							seed = generateString(seed, iteration, rules);
-							drawingElements = generateDrawingElements(seed, cWidth, cHeight, length, angle);
-							postMessage(drawingElements);
-					}
-			} else {
-				 	seed = generateString(seed, iteration, rules);
-				 	drawingElements = generateDrawingElements(seed, cWidth, cHeight, length, angle);
-				 	postMessage(drawingElements);
-			}
+      if (drawIteration)
+      {
+          var i = 0;
+          (function delayed (j) {
+              setTimeout(function () {
+                  var s = generateString(seed, ++j, rules);
+                  drawingElements = generateDrawingElements(s, cWidth, cHeight, angle);
+                  drawingElements["drawIteration"] = drawIteration;
+                  postMessage(drawingElements);
+                  if (j < iteration) { 
+                      delayed(j);
+                  }
+              }, 1000);
+          })(i);
+      } else {
+           var s = generateString(seed, iteration, rules);
+           drawingElements = generateDrawingElements(s, cWidth, cHeight, angle);
+		   drawingElements["drawIteration"] = drawIteration;
+           postMessage(drawingElements);
+      }
     }
   };
 
   function Point(x, y, c) {
     this.x = x;
     this.y = y;
-		this.color = c;
+    this.color = c;
   };
 
   function Color(r, g, b, o) {
@@ -75,27 +83,27 @@ var lsystem_worker = function() {
     return seed;
   }
 
-  function generateDrawingElements(seed, cWidth, cHeight, length, angle) {
+  function generateDrawingElements(seed, cWidth, cHeight, angle) {
     var center = new Point(cWidth / 2, cHeight / 2),
         r = g = b = o = 128,
         color = new Color(r, g, b, o),
         start = new Point(center.x, center.y, color),
         end = new Point(center.x, center.y, color),
-				offset = new Point(0, 0),
+        offset = new Point(0, 0),
         stack = [],
-				points = [start],
+        points = [start],
         right = left = cWidth / 2,
         top = bottom = cHeight / 2,
         changeDirection = false,
         currentAngle = -1.57079633,
-				scale,
-				drawingElements;
+        scale,
+        drawingElements;
 
     for (var i = 0; i < seed.length; ++i) {
       switch (seed[i]) {
         case "f":
-          end.x = start.x + length * Math.cos(currentAngle);
-          end.y = start.y + length * Math.sin(currentAngle);
+          end.x = start.x + LENGTH * Math.cos(currentAngle);
+          end.y = start.y + LENGTH * Math.sin(currentAngle);
           points.push(new Point(end.x, end.y, color));
 
           // redefine boundaries
@@ -132,20 +140,20 @@ var lsystem_worker = function() {
     offset.x = Math.floor(center.x - (left + right) / 2);
     offset.y = Math.floor(center.y - (top + bottom) / 2);
 
-		imageHeight = bottom - top;
-	  imageWidth = right -left;
+    imageHeight = bottom - top;
+    imageWidth = right -left;
 
-	 	dominant = imageHeight - imageWidth > 0 ? imageHeight : imageWidth;
+    dominant = imageHeight - imageWidth > 0 ? imageHeight : imageWidth;
 
-		scale = 600 / dominant;
+    scale = 600 / dominant;
 
-		drawingElements = {
+    drawingElements = {
         points: points,
-				offset: offset,
-				scale: scale
-		};
+        offset: offset,
+        scale: scale
+    };
 
-		return drawingElements;
+    return drawingElements;
   }
 
   return {
