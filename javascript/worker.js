@@ -31,17 +31,17 @@ var lsystem_worker = function() {
           (function delayed (j) {
               setTimeout(function () {
                   var s = generateString(seed, ++j, rules);
-                  drawingElements = generateDrawingElements(s, cWidth, cHeight, angle);
+                  drawingElements = generateDrawingElements(s, cWidth, cHeight, angle, drawIteration);
                   drawingElements["drawIteration"] = drawIteration;
                   postMessage(drawingElements);
                   if (j < iteration) { 
                       delayed(j);
                   }
-              }, 1000);
+              }, 2000);
           })(i);
       } else {
            var s = generateString(seed, iteration, rules);
-           drawingElements = generateDrawingElements(s, cWidth, cHeight, angle);
+           drawingElements = generateDrawingElements(s, cWidth, cHeight, angle, drawIteration);
 		   drawingElements["drawIteration"] = drawIteration;
            postMessage(drawingElements);
       }
@@ -83,7 +83,7 @@ var lsystem_worker = function() {
     return seed;
   }
 
-  function generateDrawingElements(seed, cWidth, cHeight, angle) {
+  function generateDrawingElements(seed, cWidth, cHeight, angle, drawIteration) {
     var center = new Point(cWidth / 2, cHeight / 2),
         r = g = b = o = 128,
         color = new Color(r, g, b, o),
@@ -146,6 +146,11 @@ var lsystem_worker = function() {
     dominant = imageHeight - imageWidth > 0 ? imageHeight : imageWidth;
 
     scale = 600 / dominant;
+
+    if (drawIteration)
+    {
+
+    }
 
     drawingElements = {
         points: points,

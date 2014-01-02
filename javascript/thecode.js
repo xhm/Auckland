@@ -5,7 +5,6 @@ $(document).ready(function () {
       lsystem_worker;
      
   ctx.imageSmoothingEnabled = false;
-  //ctx.clearRect(0, 0, c.width, c.height);
 
   if (typeof(Worker) !== 'undefined') { 
       lsystem_worker = new Worker('javascript/worker.js'); 
@@ -22,6 +21,10 @@ $(document).ready(function () {
 
               if (e.data.drawIteration) {
                   ctx.restore();
+                  ctx.save();
+                  ctx.translate(-(scale*660-660)/2, -(scale*660-660)/2);
+                  ctx.lineWidth = 1 / scale;
+                  ctx.scale(scale, scale);
                   ctx.clearRect(0, 0, c.width, c.height);
                   ctx.beginPath(); 
                   if (points && points.length !== 0) {
@@ -34,9 +37,6 @@ $(document).ready(function () {
 
               } else {
                   ctx.restore();
-                  ctx.save();
-                  ctx.translate(-(scale*660-660)/2, -(scale*660-660)/2);
-                  ctx.scale(scale, scale);
                   ctx.clearRect(0, 0, c.width, c.height);
                   ctx.beginPath(); 
 
